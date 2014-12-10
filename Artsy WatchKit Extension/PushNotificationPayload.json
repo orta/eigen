@@ -1,0 +1,22 @@
+{
+    "aps": {
+        "alert": "You have been outbid",
+        "title": "Outbid",
+        "category": "myCategory"
+    },
+    
+    "WatchKit Simulator Actions": [
+        {
+            "title": "BID AGAIN",
+            "identifier": "bidAgainTapped"
+        }
+    ],
+
+    "image_url" : "http://stagic1.artsy.net/additional_images/5429bb6e7261692cdc7d0800/square.jpg",
+    "artwork_title" : "Mitered Squares, Plus II",
+    "artwork_date" : "1976",
+    "artwork_artist" : "JOSEPH ALBERS",
+
+    "your_last_bid": 12500,
+    "minimum_bid": 13500
+}
