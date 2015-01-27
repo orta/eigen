@@ -28,11 +28,11 @@
 {
     if ([[self feedTimeline] numberOfItems] > 0) {
         [self addPageTitleWithString:@"Posts"];
+
         [(ORStackView *)self.view addGenericSeparatorWithSideMargin: @"20"];
         for (NSInteger i = 0; i < [[self feedTimeline] numberOfItems]; i++) {
             ARPostFeedItem *postFeedItem = (ARPostFeedItem *) [[self feedTimeline] itemAtIndex:i];
-            ARPostFeedItemLinkView * postLinkView = [[ARPostFeedItemLinkView alloc] init];
-            [postLinkView updateWithPostFeedItem:postFeedItem];
+            ARPostFeedItemLinkView * postLinkView = [[ARPostFeedItemLinkView alloc] initWithPostFeedItem:postFeedItem withSeparator:YES];
             [self addSubview:postLinkView withTopMargin:nil sideMargin:nil];
         }
     }

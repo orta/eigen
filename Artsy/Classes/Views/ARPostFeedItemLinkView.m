@@ -1,92 +1,57 @@
 #import "ARPostFeedItemLinkView.h"
 #import "ARPostFeedItem.h"
 #import "ARAspectRatioImageView.h"
+#import <ORStackView/ORSplitStackView.h>
 
 @implementation ARPostFeedItemLinkView
 
-- (id)init
+- (instancetype)initWithPostFeedItem:(ARPostFeedItem *)postFeedItem withSeparator:(BOOL)withSeparator
 {
     self = [super init];
-    if (self) {
-        [self addTarget:nil action:@selector(tappedPostFeedItemLinkView:) forControlEvents:UIControlEventTouchUpInside];
-    }
-    return self;
-}
+    if (!self) { return nil; };
 
-- (void)updateWithPostFeedItem:(ARPostFeedItem *)postFeedItem
-{
-    [self updateWithPostFeedItem:postFeedItem withSeparator:YES];
-}
+    [self addTarget:nil action:@selector(tappedPostFeedItemLinkView:) forControlEvents:UIControlEventTouchUpInside];
 
-- (void)updateWithPostFeedItem:(ARPostFeedItem *)postFeedItem withSeparator:(BOOL)withSeparator
-{
     ARSeparatorView *separatorView = [[ARSeparatorView alloc] init];
     [self addSubview:separatorView];
 
     ARAspectRatioImageView *imageView = [[ARAspectRatioImageView alloc] init];
     [self addSubview:imageView];
 
-    UIView *imageFiller = [[UIView alloc] init];
-    imageFiller.userInteractionEnabled = NO;
-    [self addSubview:imageFiller];
+    ORSplitStackView *stack = [[ORSplitStackView alloc] initWithLeftPredicate:@"120" rightPredicate:nil];
+    [self addSubview:stack];
+    [self alignToView:stack];
 
-    UIView *labelContainer = [[UIView alloc] init];
-    labelContainer.userInteractionEnabled = NO;
-    [self addSubview:labelContainer];
-
-    UIView *labelFiller = [[UIView alloc] init];
-    labelFiller.userInteractionEnabled = NO;
-    [self addSubview:labelFiller];
+    stack.userInteractionEnabled = NO;
 
     UILabel *postTitleLabel = [ARThemedFactory labelForFeedItemHeaders];
     postTitleLabel.font = [postTitleLabel.font fontWithSize:20];
     [postTitleLabel setText:[postFeedItem title] withLineHeight:1.5];
-    [labelContainer addSubview:postTitleLabel];
-
-    // Auto Layout
+    postTitleLabel.preferredMaxLayoutWidth = 180;
+    postTitleLabel.numberOfLines = 0;
+    [stack.rightStack addSubview:postTitleLabel withTopMargin:@"20" sideMargin:@"20"];
+    [stack.leftStack addSubview:imageView withTopMargin:@"20" sideMargin:@"20"];
+    [stack.leftStack setBottomMarginHeight:20];
+    [stack.rightStack setBottomMarginHeight:20];
 
     [separatorView alignTop:nil leading:@"10" bottom:@"0" trailing:@"-10" toView:self];
-
-    [imageView constrainWidth:@"120"];
-
-    [imageView alignLeadingEdgeWithView:self predicate:@"10"];
-    [imageView alignTopEdgeWithView:self predicate:@"20"];
-    [imageView setContentMode:UIViewContentModeScaleAspectFit];
-
-    [imageFiller constrainTopSpaceToView:imageView predicate:@"0"];
-
-    [labelContainer constrainLeadingSpaceToView:imageView predicate:@"20"];
-
-    [labelContainer alignTopEdgeWithView:imageView predicate:@"0"];
-    [labelContainer alignTrailingEdgeWithView:self predicate:@"-10"];
-    [postTitleLabel alignTopEdgeWithView:labelContainer predicate:@"0"];\
 
     if (postFeedItem.profile.profileName) {
         UILabel *postAuthorLabel = [ARThemedFactory labelForLinkItemSubtitles];
         postAuthorLabel.text = [postFeedItem.profile.profileName uppercaseString];
-        [labelContainer addSubview:postAuthorLabel];
-        [postAuthorLabel constrainTopSpaceToView:postTitleLabel predicate:@"5"];
-        [labelContainer alignBottomEdgeWithView:postAuthorLabel predicate:@"0"];
-        [UIView alignLeadingAndTrailingEdgesOfViews:@[postTitleLabel, postAuthorLabel, labelContainer]];
-    } else {
-        [UIView alignLeadingAndTrailingEdgesOfViews:@[postTitleLabel, labelContainer]];
-        [labelContainer alignBottomEdgeWithView:postTitleLabel predicate:@"0"];
-    };
-    [UIView alignLeadingAndTrailingEdgesOfViews:@[labelFiller, labelContainer]];
-    [labelFiller constrainTopSpaceToView:labelContainer predicate:@"0"];
-
-    [self alignBottomEdgeWithView:labelFiller predicate:@"21"];
-    [self alignBottomEdgeWithView:imageFiller predicate:@"21"];
+        [stack.rightStack addSubview:postAuthorLabel withTopMargin:@"5" sideMargin:@"20"];
+    }
 
     _targetPath = NSStringWithFormat(@"/post/%@", postFeedItem.postID);
 
     // Layout the view to calculate bounds and frame for the image view before adding the image.
-    [self layoutIfNeeded];
     NSURL *imageUrl = [NSURL URLWithString:postFeedItem.imageURL];
     [imageView ar_setImageWithURL:imageUrl completed:(SDWebImageCompletionBlock)^{
         [self setNeedsLayout];
         [self layoutIfNeeded];
     }];
+
+    return self;
 }
 
 @end
